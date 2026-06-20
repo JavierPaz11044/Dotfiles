@@ -27,7 +27,7 @@ Profiles:
   wayland    Wayland stack: common + hyprland + eww + sddm
 
 Modules:
-  apt        Enable contrib/non-free repositories
+  apt        Refresh APT package lists
   kitty      Kitty binary, fonts, terminal config
   bspwm      bspwm/sxhkd (X11 only)
   lightdm    LightDM login manager with bspwm session (X11)
