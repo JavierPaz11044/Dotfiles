@@ -21,7 +21,7 @@ lightdm_install() {
   fi
 
   log_info "Installing LightDM..."
-  DEBIAN_FRONTEND=noninteractive apt-get install -y lightdm lightdm-gtk-greeter polkit
+  DEBIAN_FRONTEND=noninteractive apt-get install -y lightdm lightdm-gtk-greeter polkitd dbus-user-session
 
   deploy_system_file \
     "${DOTFILES_ROOT}/config/x11/lightdm/50-bspwm.conf" \

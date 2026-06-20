@@ -34,6 +34,35 @@ hyprland_enable_backports() {
   apt-get update
 }
 
+hyprland_install_polkit_agent() {
+  local codename="$1"
+
+  log_info "Installing Polkit authentication agent for Hyprland..."
+
+  case "$codename" in
+    trixie)
+      if apt-cache show -t trixie-backports hyprpolkitagent >/dev/null 2>&1; then
+        apt-get install -y -t trixie-backports hyprpolkitagent
+        return
+      fi
+      ;;
+    forky|sid)
+      if apt-cache show hyprpolkitagent >/dev/null 2>&1; then
+        apt-get install -y hyprpolkitagent
+        return
+      fi
+      ;;
+  esac
+
+  if apt-cache show lxpolkit >/dev/null 2>&1; then
+    log_warn "hyprpolkitagent not found, installing lxpolkit as fallback"
+    apt-get install -y lxpolkit
+    return
+  fi
+
+  log_warn "No graphical polkit agent package found; install hyprpolkitagent manually"
+}
+
 hyprland_install_from_apt() {
   local codename="$1"
 
@@ -98,6 +127,7 @@ hyprland_install() {
   log_info "Detected Debian codename: ${codename}"
 
   hyprland_install_from_apt "$codename"
+  hyprland_install_polkit_agent "$codename"
 
   deploy_user_file "${DOTFILES_ROOT}/config/wayland/hyprland/hyprland.conf" ".config/hypr/hyprland.conf"
 }

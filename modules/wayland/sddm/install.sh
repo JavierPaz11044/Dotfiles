@@ -29,8 +29,16 @@ sddm_install_hyprland_session() {
 }
 
 sddm_install() {
-  log_info "Installing SDDM..."
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends sddm polkit
+  log_info "Installing SDDM and PolicyKit..."
+  DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    sddm \
+    polkitd \
+    dbus-user-session \
+    libpam-systemd
+
+  if ! systemctl is-active --quiet polkit; then
+    systemctl start polkit || true
+  fi
 
   deploy_system_file \
     "${DOTFILES_ROOT}/config/wayland/sddm/10-hyprland.conf" \
