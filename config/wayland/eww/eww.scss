@@ -1,0 +1,34 @@
+// Catppuccin Mocha — matches common/kitty theme
+$bg: #1e1e2e;
+$fg: #cdd6f4;
+$active: #cba6f7;
+$inactive: #585b70;
+$occupied: #89b4fa;
+
+.bar {
+  background-color: $bg;
+  color: $fg;
+  padding: 4px 12px;
+}
+
+.workspaces {
+  button {
+    min-width: 28px;
+    min-height: 24px;
+    padding: 2px 8px;
+    border: 1px solid $inactive;
+    border-radius: 6px;
+    background-color: transparent;
+    color: $fg;
+
+    &.active {
+      background-color: $active;
+      color: #11111b;
+      border-color: $active;
+    }
+
+    &.inactive:hover {
+      border-color: $occupied;
+    }
+  }
+}
