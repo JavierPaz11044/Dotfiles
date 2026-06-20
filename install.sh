@@ -31,7 +31,7 @@ Modules:
   kitty      Kitty binary, fonts, terminal config
   bspwm      bspwm/sxhkd (X11 only)
   lightdm    LightDM login manager with bspwm session (X11)
-  hyprland   Hyprland compositor (Wayland)
+  hyprland   Hyprland compositor (Trixie: needs backports)
   eww        eww workspace bar (Wayland, builds from source)
   sddm       SDDM login manager with Hyprland session (Wayland)
 EOF
