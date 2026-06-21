@@ -1,0 +1,171 @@
+;; Tokyo Night bar — adapted for Hyprland + Wayland eww
+;; Based on https://github.com/raexera/tokyo
+
+(defvar eww "$HOME/.local/bin/eww -c $HOME/.config/eww/bar")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Widgets
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defwidget launcher []
+  (box :orientation "v"
+       :space-evenly "false"
+       :spacing -15
+    (button :class "launcher_icon"
+            :onclick "hyprlauncher"
+      "")))
+
+(defwidget workspaces []
+  (literal :content workspace))
+(deflisten workspace "scripts/workspace")
+
+(defwidget bat []
+  (box :orientation "v"
+       :space-evenly "false"
+    (label :class "bat"
+           :halign "end"
+           :text battery
+           :tooltip "Battery: ${battery-cappacity}%")))
+(defpoll battery :interval "1s" "scripts/battery icon")
+(defpoll battery-cappacity :interval "1s" "scripts/battery percent")
+
+(defwidget wifi []
+  (box :orientation "v"
+       :tooltip wifi-name
+    (button :class "wifi-icon" wifi-icon)))
+(defpoll wifi-icon :interval "1s" "scripts/wifi icon")
+(defpoll wifi-name :interval "1s" "scripts/wifi name")
+
+(defwidget bright []
+  (eventbox :onhover "${eww} update bright=true"
+            :onhoverlost "${eww} update bright=false"
+    (box :orientation "v"
+         :space-evenly "false"
+         :spacing 2
+      (revealer :transition "slideup"
+                 :reveal bright
+                 :duration "550ms"
+        (scale :class "bribar"
+               :value current-brightness
+               :tooltip "Brightness: ${current-brightness}%"
+               :onchange "brightnessctl set {}%"
+               :orientation "v"
+               :flipped true
+               :max 101
+               :min 0))
+      (label :class "brightness-icon" ""))))
+(defpoll current-brightness :interval "1s" "brightnessctl -m 2>/dev/null | awk -F, '{gsub(/%/,\"\",$4); print $4}' || echo 0")
+(defvar bright false)
+
+(defwidget volum []
+  (eventbox :onhover "${eww} update volum=true"
+            :onhoverlost "${eww} update volum=false"
+    (box :orientation "v"
+         :space-evenly "false"
+         :spacing "2"
+      (revealer :transition "slideup"
+                 :reveal volum
+                 :duration "550ms"
+        (scale :class "volbar"
+               :value current-volume
+               :orientation "v"
+               :flipped true
+               :tooltip "Volume: ${current-volume}%"
+               :max 101
+               :min 0
+               :onchange "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ {}%"))
+      (button :class "volume-icon" ""))))
+(defpoll current-volume :interval "1s" "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{print int($2 * 100)}' || echo 0")
+(defvar volum false)
+
+(defwidget control []
+  (box :orientation "v"
+       :space-evenly false
+       :class "control"
+    (bat)
+    (wifi)
+    (bright)
+    (volum)))
+
+(defwidget time []
+  (box :orientation "v"
+       :class "time"
+       :valign "end"
+    (label :class "time-hour" hour)
+    (label :class "time-min" min)))
+(defpoll hour :interval "1s" "date '+%H'")
+(defpoll min :interval "1s" "date '+%M'")
+
+(defwidget power []
+  (eventbox :onhover "${eww} update power=true"
+            :onhoverlost "${eww} update power=false"
+    (box :orientation "v"
+         :space-evenly "false"
+         :vexpand "false"
+         :class "powermenu"
+      (revealer :transition "slideup"
+                 :reveal power
+                 :duration "550ms"
+        (box :orientation "v"
+             :space-evenly "false"
+          (button :class "button-reload"
+                  :tooltip "Reload Hyprland"
+                  :onclick "hyprctl reload" "")
+          (button :class "button-reb"
+                  :tooltip "Reboot"
+                  :onclick "systemctl reboot" "")
+          (button :class "button-quit"
+                  :tooltip "Logout"
+                  :onclick "hyprctl dispatch exit" "")))
+      (button :class "button-off"
+              :tooltip "Shutdown"
+              :onclick "systemctl poweroff" ""))))
+(defvar power false)
+
+(defwidget top []
+  (box :orientation "v"
+       :space-evenly "false"
+       :valign "start"
+    (launcher)
+    (workspaces)))
+
+(defwidget bottom []
+  (box :orientation "v"
+       :space-evenly false
+    (time)
+    (power)))
+
+(defwidget end []
+  (box :orientation "v"
+       :space-evenly "false"
+       :valign "end"
+       :spacing 5
+    (control)
+    (bottom)))
+
+(defwidget bar []
+  (box :class "eww_bar"
+       :orientation "v"
+       :vexpand "false"
+       :hexpand "false"
+    (top)
+    (end)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Window — Wayland: dock + exclusive so it does not float
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defwindow bar
+  :monitor 0
+  :windowtype "dock"
+  :stacking "overlay"
+  :exclusive true
+  :focusable false
+  :geometry (geometry
+    :x "0px"
+    :y "0px"
+    :width "47px"
+    :height "100%"
+    :anchor "left center")
+  :reserve (struts :side "left" :distance "47px")
+  (bar))

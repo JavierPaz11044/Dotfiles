@@ -4,6 +4,17 @@
 
 EWW_VERSION="${EWW_VERSION:-v0.6.0}"
 
+eww_install_runtime_deps() {
+  log_info "Installing eww runtime dependencies..."
+  apt-get install -y \
+    jq \
+    socat \
+    brightnessctl \
+    wireplumber \
+    fonts-font-awesome \
+    network-manager
+}
+
 eww_install_build_deps() {
   log_info "Installing eww build dependencies..."
   apt-get install -y \
@@ -58,11 +69,12 @@ EOF
 eww_install() {
   require_hyprland
 
+  eww_install_runtime_deps
   eww_install_build_deps
   eww_install_rust
   eww_build
   deploy_user_tree "${DOTFILES_ROOT}/config/wayland/eww" ".config/eww"
-  run_as_target_user chmod +x "$(dotfiles_target_home)/.config/eww/scripts/workspaces.sh"
+  find "$(dotfiles_target_home)/.config/eww/bar/scripts" -type f -exec chmod +x {} +
 }
 
 eww_install

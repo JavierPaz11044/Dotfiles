@@ -1,0 +1,135 @@
+/* Tokyo Night — adapted from https://github.com/raexera/tokyo */
+
+* {
+  all: unset;
+}
+
+$background: #1A1B26;
+$foreground: #A9B1D6;
+$black: #24283B;
+$gray: #565F89;
+$red: #F7768E;
+$green: #73DACA;
+$yellow: #E0AF68;
+$blue: #7AA2F7;
+$magenta: #BB9AF7;
+$cyan: #7DCFFF;
+$white: $foreground;
+
+.eww_bar {
+  background-color: $background;
+  padding: 0.3rem;
+}
+
+.launcher_icon {
+  color: $cyan;
+  font-family: "JetBrainsMono Nerd Font Mono", "Font Awesome 6 Free", monospace;
+  font-size: 1.4em;
+  padding: 1rem 0;
+}
+
+.works {
+  font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-weight: bold;
+  padding: 0.2rem 0.7rem;
+  background-color: $black;
+  border-radius: 5px;
+
+  button {
+    min-width: 1.4rem;
+    min-height: 1.4rem;
+    margin: 0.35rem 0;
+    color: $gray;
+  }
+}
+
+.0, .01, .02, .03, .04, .05, .06,
+.011, .022, .033, .044, .055, .066 {
+  margin: 0.35rem 0;
+}
+
+.0 { color: $gray; }
+.01, .02, .03, .04, .05, .06 { color: $gray; }
+.011, .022, .033, .044, .055, .066 {
+  color: $foreground;
+  background-color: $magenta;
+  border-radius: 4px;
+}
+
+.control {
+  padding: 0.5rem;
+  font-family: "JetBrainsMono Nerd Font Mono", "Font Awesome 6 Free", monospace;
+  font-size: 1.2em;
+  background-color: $black;
+  border-radius: 5px;
+}
+
+.bat {
+  font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-size: 1em;
+  padding-right: 0.5rem;
+  color: $blue;
+}
+
+.wifi-icon {
+  margin-bottom: 0.2rem;
+  color: $magenta;
+}
+
+.brightness-icon {
+  margin: 0.2rem 0;
+  color: $yellow;
+}
+
+.volume-icon {
+  margin: 0.2rem 0;
+  color: $green;
+}
+
+scale trough {
+  all: unset;
+  background-color: $background;
+  border-radius: 5px;
+  min-height: 80px;
+  min-width: 10px;
+  margin: 0.3rem 0;
+}
+
+.bribar trough highlight {
+  background-color: $yellow;
+  border-radius: 5px;
+}
+
+.volbar trough highlight {
+  background-color: $green;
+  border-radius: 5px;
+}
+
+.time {
+  font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-weight: bold;
+  font-size: 1.1em;
+  background-color: $black;
+  color: $white;
+  border-radius: 5px;
+  padding: 0.7rem 0 0.5rem;
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.powermenu {
+  font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.button-reload, .button-reb, .button-quit, .button-off {
+  padding: 0.5rem 0.2rem 0.3rem;
+  min-width: 1.2rem;
+  text-align: center;
+}
+
+.button-off { color: $red; }
+.button-reload { color: $green; }
+.button-reb { color: $yellow; }
+.button-quit { color: $magenta; }

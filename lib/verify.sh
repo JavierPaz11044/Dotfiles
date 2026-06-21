@@ -141,11 +141,17 @@ verify_eww() {
   fi
   log_info "[OK] eww: binary installed"
 
-  if [[ ! -f "${home}/.config/eww/eww.yuck" ]]; then
-    log_error "[FAIL] eww: config missing at ~/.config/eww/eww.yuck"
+  if [[ ! -f "${home}/.config/eww/bar/eww.yuck" ]]; then
+    log_error "[FAIL] eww: config missing at ~/.config/eww/bar/eww.yuck"
     return 1
   fi
-  log_info "[OK] eww: config deployed"
+  log_info "[OK] eww: Tokyo bar config deployed"
+
+  if [[ ! -x "${home}/.config/eww/bar/scripts/workspace" ]]; then
+    log_error "[FAIL] eww: workspace script missing or not executable"
+    return 1
+  fi
+  log_info "[OK] eww: workspace script ready"
 
   return 0
 }
