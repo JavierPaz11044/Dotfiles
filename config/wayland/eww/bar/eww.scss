@@ -1,135 +1,180 @@
-/* Tokyo Night — adapted from https://github.com/raexera/tokyo */
+// Dotfiles bar — Catppuccin Mocha (matches common/kitty/kitty.conf)
 
 * {
   all: unset;
 }
 
-$background: #1A1B26;
-$foreground: #A9B1D6;
-$black: #24283B;
-$gray: #565F89;
-$red: #F7768E;
-$green: #73DACA;
-$yellow: #E0AF68;
-$blue: #7AA2F7;
-$magenta: #BB9AF7;
-$cyan: #7DCFFF;
-$white: $foreground;
+// Palette
+$base:     #1e1e2e;
+$mantle:   #181825;
+$surface0: #313244;
+$surface1: #45475a;
+$overlay0: #6c7086;
+$text:     #cdd6f4;
+$subtext:  #a6adc8;
+$mauve:    #cba6f7;
+$blue:     #89b4fa;
+$green:    #a6e3a1;
+$yellow:   #f9e2af;
+$red:      #f38ba8;
+$peach:    #fab387;
 
-.eww_bar {
-  background-color: $background;
-  padding: 0.3rem;
+.bar {
+  background-color: $base;
+  color: $text;
+  border-bottom: 1px solid $surface0;
+  min-height: 38px;
 }
 
-.launcher_icon {
-  color: $cyan;
-  font-family: "JetBrainsMono Nerd Font Mono", "Font Awesome 6 Free", monospace;
-  font-size: 1.4em;
-  padding: 1rem 0;
+.shell {
+  padding: 0 14px;
+  min-height: 38px;
 }
 
-.works {
+.left, .right {
+  min-height: 38px;
+}
+
+// Terminal launcher
+.term-btn {
   font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-size: 13px;
   font-weight: bold;
-  padding: 0.2rem 0.7rem;
-  background-color: $black;
-  border-radius: 5px;
+  color: $green;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: $mantle;
+  border: 1px solid $surface0;
 
-  button {
-    min-width: 1.4rem;
-    min-height: 1.4rem;
-    margin: 0.35rem 0;
-    color: $gray;
+  &:hover {
+    border-color: $green;
+    color: $text;
   }
 }
 
-.0, .01, .02, .03, .04, .05, .06,
-.011, .022, .033, .044, .055, .066 {
-  margin: 0.35rem 0;
+// Workspaces
+.workspaces {
+  padding: 4px;
+  background-color: $mantle;
+  border-radius: 8px;
+  border: 1px solid $surface0;
 }
 
-.0 { color: $gray; }
-.01, .02, .03, .04, .05, .06 { color: $gray; }
-.011, .022, .033, .044, .055, .066 {
-  color: $foreground;
-  background-color: $magenta;
-  border-radius: 4px;
-}
-
-.control {
-  padding: 0.5rem;
-  font-family: "JetBrainsMono Nerd Font Mono", "Font Awesome 6 Free", monospace;
-  font-size: 1.2em;
-  background-color: $black;
-  border-radius: 5px;
-}
-
-.bat {
+button.ws-idle,
+button.ws-occupied,
+button.ws-active {
   font-family: "JetBrainsMono Nerd Font Mono", monospace;
-  font-size: 1em;
-  padding-right: 0.5rem;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 26px;
+  min-height: 24px;
+  border-radius: 6px;
+  padding: 0 6px;
+}
+
+.ws-idle {
+  color: $overlay0;
+  background-color: transparent;
+
+  &:hover {
+    color: $subtext;
+    background-color: $surface0;
+  }
+}
+
+.ws-occupied {
   color: $blue;
+  background-color: $surface0;
+  border: 1px solid $surface1;
+
+  &:hover {
+    color: $text;
+    border-color: $blue;
+  }
 }
 
-.wifi-icon {
-  margin-bottom: 0.2rem;
-  color: $magenta;
+.ws-active {
+  color: $base;
+  background-color: $mauve;
+  border: 1px solid $mauve;
 }
 
-.brightness-icon {
-  margin: 0.2rem 0;
-  color: $yellow;
+// Status chips
+.status {
+  padding: 0 4px;
 }
 
-.volume-icon {
-  margin: 0.2rem 0;
-  color: $green;
-}
-
-scale trough {
-  all: unset;
-  background-color: $background;
-  border-radius: 5px;
-  min-height: 80px;
-  min-width: 10px;
-  margin: 0.3rem 0;
-}
-
-.bribar trough highlight {
-  background-color: $yellow;
-  border-radius: 5px;
-}
-
-.volbar trough highlight {
-  background-color: $green;
-  border-radius: 5px;
-}
-
-.time {
+.chip {
   font-family: "JetBrainsMono Nerd Font Mono", monospace;
-  font-weight: bold;
-  font-size: 1.1em;
-  background-color: $black;
-  color: $white;
-  border-radius: 5px;
-  padding: 0.7rem 0 0.5rem;
-  margin: 0.5rem 0;
-  text-align: center;
+  font-size: 11px;
+  color: $subtext;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background-color: $mantle;
+  border: 1px solid transparent;
 }
 
-.powermenu {
+.chip-volume { color: $green; }
+.chip-battery { color: $peach; }
+.chip-net {
+  color: $blue;
+  max-width: 120px;
+}
+
+// Clock
+.clock {
+  min-width: 72px;
+}
+
+.clock-time {
   font-family: "JetBrainsMono Nerd Font Mono", monospace;
-  font-size: 1.1em;
+  font-size: 14px;
   font-weight: bold;
+  color: $text;
 }
 
-.button-reload, .button-reb, .button-quit, .button-off {
-  padding: 0.5rem 0.2rem 0.3rem;
-  min-width: 1.2rem;
-  text-align: center;
+.clock-date {
+  font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-size: 10px;
+  color: $subtext;
 }
 
-.button-off { color: $red; }
-.button-reload { color: $green; }
-.button-reb { color: $yellow; }
-.button-quit { color: $magenta; }
+// Power
+.power-btn {
+  font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-size: 14px;
+  color: $subtext;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 6px;
+
+  &:hover {
+    color: $red;
+    background-color: $mantle;
+  }
+}
+
+.power-menu {
+  background-color: $mantle;
+  border: 1px solid $surface0;
+  border-radius: 8px;
+  padding: 6px;
+  margin-top: 4px;
+}
+
+.power-action {
+  font-family: "JetBrainsMono Nerd Font Mono", monospace;
+  font-size: 11px;
+  color: $subtext;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-align: left;
+
+  &:hover {
+    background-color: $surface0;
+    color: $text;
+  }
+
+  &.warn:hover { color: $yellow; }
+  &.danger:hover { color: $red; }
+}

@@ -74,7 +74,7 @@ eww_install() {
   eww_install_rust
   eww_build
   deploy_user_tree "${DOTFILES_ROOT}/config/wayland/eww" ".config/eww"
-  find "$(dotfiles_target_home)/.config/eww/bar/scripts" -type f -exec chmod +x {} +
+  find "$(dotfiles_target_home)/.config/eww/bar/scripts" -type f \( -name '*.sh' -o ! -name '*.sh' \) -exec chmod +x {} +
 }
 
 eww_install

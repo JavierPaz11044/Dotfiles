@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Volume percent from PipeWire.
+
+wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{
+  pct = int($2 * 100)
+  if ($0 ~ /MUTED/) print "mute"
+  else print pct "%"
+}' || echo "--"

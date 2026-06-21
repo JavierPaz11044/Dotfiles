@@ -1,13 +1,17 @@
-#!/bin/sh
+#!/usr/bin/env bash
+# Short network status for the bar.
 
-symbol() {
-[ $(cat /sys/class/net/w*/operstate) = down ] && echo  && exit
-echo 
-}
+if command -v nmcli >/dev/null 2>&1; then
+  nmcli -t -f ACTIVE,SSID dev wifi 2>/dev/null | awk -F: '$1 == "yes" { print $2; exit }'
+  exit 0
+fi
 
-name() {
-nmcli | grep "^wlp" | sed 's/\ connected\ to\ /Connected to /g' | cut -d ':' -f2
-}
+for iface in /sys/class/net/wl*; do
+  [[ -e "$iface/operstate" ]] || continue
+  if [[ "$(cat "$iface/operstate")" == "up" ]]; then
+    echo "wifi"
+    exit 0
+  fi
+done
 
-[ "$1" = "icon" ] && symbol && exit
-[ "$1" = "name" ] && name && exit
+echo "offline"

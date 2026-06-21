@@ -145,13 +145,13 @@ verify_eww() {
     log_error "[FAIL] eww: config missing at ~/.config/eww/bar/eww.yuck"
     return 1
   fi
-  log_info "[OK] eww: Tokyo bar config deployed"
+  log_info "[OK] eww: bar config deployed"
 
-  if [[ ! -x "${home}/.config/eww/bar/scripts/workspace" ]]; then
-    log_error "[FAIL] eww: workspace script missing or not executable"
+  if [[ ! -x "${home}/.config/eww/bar/scripts/workspaces.sh" ]]; then
+    log_error "[FAIL] eww: workspaces script missing or not executable"
     return 1
   fi
-  log_info "[OK] eww: workspace script ready"
+  log_info "[OK] eww: workspaces script ready"
 
   return 0
 }
