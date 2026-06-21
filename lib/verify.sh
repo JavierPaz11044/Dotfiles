@@ -67,11 +67,17 @@ verify_hyprland() {
     log_info "[OK] hyprland: session Exec line present"
   fi
 
-  if [[ ! -f "${home}/.config/hypr/hyprland.conf" ]]; then
-    log_error "[FAIL] hyprland: config missing at ~/.config/hypr/hyprland.conf"
+  if [[ ! -f "${home}/.config/hypr/hyprland.lua" ]]; then
+    log_error "[FAIL] hyprland: config missing at ~/.config/hypr/hyprland.lua"
     return 1
   fi
   log_info "[OK] hyprland: user config deployed"
+
+  if ! grep -q '\.local/bin/kitty' "${home}/.config/hypr/hyprland.lua"; then
+    log_warn "[WARN] hyprland: config does not reference ~/.local/bin/kitty"
+  else
+    log_info "[OK] hyprland: kitty path configured"
+  fi
 
   return 0
 }

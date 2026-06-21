@@ -114,7 +114,7 @@ hyprland_install() {
   hyprland_install_session
   hyprland_install_polkit_agent
 
-  deploy_user_file "${DOTFILES_ROOT}/config/wayland/hyprland/hyprland.conf" ".config/hypr/hyprland.conf"
+  deploy_user_file "${DOTFILES_ROOT}/config/wayland/hyprland/hyprland.lua" ".config/hypr/hyprland.lua"
 }
 
 hyprland_install
