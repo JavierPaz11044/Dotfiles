@@ -56,6 +56,8 @@ EOF
 }
 
 eww_install() {
+  require_hyprland
+
   eww_install_build_deps
   eww_install_rust
   eww_build
@@ -64,3 +66,10 @@ eww_install() {
 }
 
 eww_install
+
+if ! verify_eww; then
+  log_error "eww verification failed."
+  exit 1
+fi
+
+log_info "eww step complete."

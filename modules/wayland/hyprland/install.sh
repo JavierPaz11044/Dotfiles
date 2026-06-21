@@ -1,43 +1,36 @@
 #!/usr/bin/env bash
-# Install Hyprland and deploy Wayland compositor configuration.
+# Install Hyprland, session launcher, polkit agent, and user config.
 # https://wiki.hypr.land/Getting-Started/Installation/
 
-hyprland_package_available() {
-  local codename="$1"
-  local pocket="$2"
+hyprland_install_session() {
+  local hypr_bin session_dir session_file
 
-  if [[ -n "$pocket" ]]; then
-    apt-cache show -t "${codename}-${pocket}" hyprland >/dev/null 2>&1
-  else
-    apt-cache show hyprland >/dev/null 2>&1
-  fi
-}
-
-hyprland_enable_backports() {
-  local codename="$1"
-  local src dest
-
-  dest="/etc/apt/sources.list.d/dotfiles-${codename}-backports.list"
-  src="${DOTFILES_ROOT}/config/common/apt/trixie-backports.list"
-
-  if [[ -f "$dest" ]]; then
-    log_info "Backports source already present: ${dest}"
-    return
+  hypr_bin="$(command -v Hyprland || command -v hyprland || true)"
+  if [[ -z "$hypr_bin" ]]; then
+    log_error "Hyprland binary not found after package install."
+    exit 1
   fi
 
-  if [[ "$codename" != "trixie" || ! -f "$src" ]]; then
-    return 1
-  fi
+  session_dir="/usr/share/wayland-sessions"
+  session_file="${session_dir}/hyprland.desktop"
 
-  log_info "Enabling ${codename}-backports for Hyprland..."
-  deploy_system_file "$src" "$dest"
-  apt-get update
+  log_info "Installing Hyprland session launcher at ${session_file}..."
+  {
+    printf '%s\n' "[Desktop Entry]"
+    printf '%s\n' "Name=Hyprland"
+    printf '%s\n' "Comment=Hyprland Wayland compositor"
+    printf '%s\n' "Exec=dbus-run-session ${hypr_bin}"
+    printf '%s\n' "Type=Application"
+    printf '%s\n' "DesktopNames=Hyprland"
+  } > "$session_file"
+  chmod 644 "$session_file"
 }
 
 hyprland_install_polkit_agent() {
-  local codename="$1"
+  local codename
 
-  log_info "Installing Polkit authentication agent for Hyprland..."
+  codename="$(debian_codename)"
+  log_info "Installing Polkit authentication agent..."
 
   case "$codename" in
     trixie)
@@ -55,81 +48,63 @@ hyprland_install_polkit_agent() {
   esac
 
   if apt-cache show lxpolkit >/dev/null 2>&1; then
-    log_warn "hyprpolkitagent not found, installing lxpolkit as fallback"
+    log_warn "hyprpolkitagent not found, installing lxpolkit"
     apt-get install -y lxpolkit
     return
   fi
 
-  log_warn "No graphical polkit agent package found; install hyprpolkitagent manually"
+  log_warn "No polkit agent package found; you may need to install hyprpolkitagent manually"
 }
 
-hyprland_install_from_apt() {
-  local codename="$1"
+hyprland_install_package() {
+  local codename pocket
+
+  codename="$(debian_codename)"
+  pocket="${codename}-backports"
 
   log_info "Updating package lists..."
   apt-get update
 
-  apt-get install -y jq socat
+  apt-get install -y jq socat polkitd dbus-user-session
 
   case "$codename" in
     bookworm|bullseye)
       log_error "Hyprland is not available on Debian ${codename}."
-      log_error "Use Debian 13 (Trixie) with backports, or Debian 14 (Forky) or newer."
-      log_error "See: https://wiki.hypr.land/Getting-Started/Installation/"
       exit 1
       ;;
     trixie)
-      if hyprland_package_available "$codename" backports; then
-        log_info "Installing Hyprland from trixie-backports..."
-        apt-get install -y -t trixie-backports hyprland
-        return
-      fi
-
-      if hyprland_package_available "$codename" ""; then
-        log_info "Installing Hyprland..."
-        apt-get install -y hyprland
-        return
-      fi
-
-      if hyprland_enable_backports "$codename" && hyprland_package_available "$codename" backports; then
-        log_info "Installing Hyprland from trixie-backports..."
-        apt-get install -y -t trixie-backports hyprland
-        return
-      fi
-
-      log_error "Hyprland is not available. On Trixie it requires backports."
-      log_error "Add manually:"
-      log_error "  deb http://deb.debian.org/debian trixie-backports main"
-      log_error "Then run: sudo apt update && sudo apt install -t trixie-backports hyprland"
-      log_error "See: https://wiki.hypr.land/Getting-Started/Installation/"
-      exit 1
+      log_info "Installing Hyprland from ${pocket}..."
+      apt-get install -y -t "$pocket" hyprland
       ;;
-    forky|sid|*)
-      if hyprland_package_available "$codename" ""; then
-        log_info "Installing Hyprland..."
-        apt-get install -y hyprland
-      elif hyprland_package_available "$codename" backports; then
-        log_info "Installing Hyprland from ${codename}-backports..."
-        apt-get install -y -t "${codename}-backports" hyprland
-      else
-        log_error "Hyprland package not found for Debian ${codename}."
-        log_error "See: https://wiki.hypr.land/Getting-Started/Installation/"
-        exit 1
-      fi
+    forky|sid)
+      apt-get install -y hyprland
+      ;;
+    *)
+      log_error "Unsupported Debian codename: ${codename}"
+      exit 1
       ;;
   esac
 }
 
 hyprland_install() {
-  local codename
+  require_backports
 
-  codename="$(debian_codename)"
-  log_info "Detected Debian codename: ${codename}"
+  log_info "Detected Debian codename: $(debian_codename)"
 
-  hyprland_install_from_apt "$codename"
-  hyprland_install_polkit_agent "$codename"
+  hyprland_install_package
+  hyprland_install_session
+  hyprland_install_polkit_agent
 
   deploy_user_file "${DOTFILES_ROOT}/config/wayland/hyprland/hyprland.conf" ".config/hypr/hyprland.conf"
 }
 
 hyprland_install
+
+# shellcheck source=lib/verify.sh
+source "${DOTFILES_ROOT}/lib/verify.sh"
+if ! verify_hyprland; then
+  log_error "Hyprland verification failed."
+  exit 1
+fi
+
+log_info "Hyprland step complete."

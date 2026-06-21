@@ -216,3 +216,6 @@ run_module() {
   # shellcheck source=/dev/null
   source "$module_script"
 }
+
+# shellcheck source=lib/verify.sh
+source "${DOTFILES_ROOT}/lib/verify.sh"
