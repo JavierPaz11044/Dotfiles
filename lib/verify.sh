@@ -53,11 +53,19 @@ verify_hyprland() {
   fi
   log_info "[OK] hyprland: session file ${session}"
 
-  if ! grep -q '^Exec=.*Hyprland\|^Exec=.*hyprland' "$session"; then
+  if [[ -x /usr/bin/start-hyprland ]]; then
+    if ! grep -q 'start-hyprland' "$session"; then
+      log_error "[FAIL] hyprland: session must use /usr/bin/start-hyprland (Hyprland 0.53+)"
+      log_error "       Run: sudo ./install.sh hyprland"
+      return 1
+    fi
+    log_info "[OK] hyprland: session uses start-hyprland"
+  elif ! grep -qE '^Exec=.*(Hyprland|hyprland)' "$session"; then
     log_error "[FAIL] hyprland: session file has no valid Exec line"
     return 1
+  else
+    log_info "[OK] hyprland: session Exec line present"
   fi
-  log_info "[OK] hyprland: session Exec line present"
 
   if [[ ! -f "${home}/.config/hypr/hyprland.conf" ]]; then
     log_error "[FAIL] hyprland: config missing at ~/.config/hypr/hyprland.conf"
@@ -92,6 +100,20 @@ verify_sddm() {
     return 1
   fi
   log_info "[OK] sddm: config installed"
+
+  local default_session session_path
+  default_session="$(grep -E '^DefaultSession=' /etc/sddm.conf.d/10-dotfiles-hyprland.conf | cut -d= -f2- | tr -d '[:space:]')"
+  if [[ -z "$default_session" ]]; then
+    log_error "[FAIL] sddm: DefaultSession not set in config"
+    return 1
+  fi
+  session_path="/usr/share/wayland-sessions/${default_session}"
+  if [[ ! -f "$session_path" ]]; then
+    log_error "[FAIL] sddm: DefaultSession points to missing file (${session_path})"
+    log_error "       Run: sudo ./install.sh hyprland"
+    return 1
+  fi
+  log_info "[OK] sddm: DefaultSession ${default_session} exists"
 
   if ! systemctl is-active --quiet polkit; then
     log_error "[FAIL] sddm: polkit service is not running"

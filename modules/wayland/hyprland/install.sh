@@ -3,7 +3,23 @@
 # https://wiki.hypr.land/Getting-Started/Installation/
 
 hyprland_install_session() {
-  local hypr_bin session_dir session_file
+  local session_dir session_file template hypr_bin
+
+  session_dir="/usr/share/wayland-sessions"
+  session_file="${session_dir}/hyprland.desktop"
+  template="${DOTFILES_ROOT}/config/wayland/hyprland/hyprland.desktop"
+
+  # Debian Hyprland 0.53+ must be started via start-hyprland (not Hyprland directly).
+  if [[ -x /usr/bin/start-hyprland ]]; then
+    if [[ -f "$session_file" ]] && grep -q 'start-hyprland' "$session_file"; then
+      log_info "Hyprland session file OK (${session_file})"
+      return
+    fi
+
+    log_info "Installing Hyprland session launcher at ${session_file}..."
+    deploy_system_file "$template" "$session_file"
+    return
+  fi
 
   hypr_bin="$(command -v Hyprland || command -v hyprland || true)"
   if [[ -z "$hypr_bin" ]]; then
@@ -11,15 +27,18 @@ hyprland_install_session() {
     exit 1
   fi
 
-  session_dir="/usr/share/wayland-sessions"
-  session_file="${session_dir}/hyprland.desktop"
+  if [[ -f "$session_file" ]]; then
+    log_warn "start-hyprland not found; keeping existing ${session_file}"
+    return
+  fi
 
-  log_info "Installing Hyprland session launcher at ${session_file}..."
+  log_warn "start-hyprland not found; installing legacy session launcher"
   {
     printf '%s\n' "[Desktop Entry]"
     printf '%s\n' "Name=Hyprland"
     printf '%s\n' "Comment=Hyprland Wayland compositor"
     printf '%s\n' "Exec=dbus-run-session ${hypr_bin}"
+    printf '%s\n' "TryExec=${hypr_bin}"
     printf '%s\n' "Type=Application"
     printf '%s\n' "DesktopNames=Hyprland"
   } > "$session_file"
